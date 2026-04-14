@@ -6,7 +6,7 @@ import { AuthProvider } from "./auth/AuthContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <AuthProvider>
-    <WebSocketProvider url="ws://localhost:3201">
+    <WebSocketProvider url="wss://chatup-api.dipaoloproyects.space">
       <App />
     </WebSocketProvider>
   </AuthProvider>,
