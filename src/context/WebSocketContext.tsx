@@ -108,20 +108,16 @@ export const WebSocketProvider = ({ children, url }: Props) => {
 
   //funcion de re-coneccion
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (status === "disconnected") {
-      interval = setInterval(() => {
+      timeout = setTimeout(() => {
         const newSocket = connect();
         setSocket(newSocket);
-      }, 1000);
+      }, 3000);
     }
 
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
+    return () => clearTimeout(timeout);
   }, [status, connect]);
 
   const send = useCallback(
