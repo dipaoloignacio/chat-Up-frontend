@@ -61,7 +61,7 @@ interface Props {
   url: string;
 }
 
-export const WebSocketProvider = ({ children, url }: Props) => {
+export const WebSocketProvider = ({ children }: Props) => {
   const [status, setStatus] = useState<ConexionStatus>("connecting");
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [lastMessage, setLastMessage] = useState<ServerMessage | null>(null);
