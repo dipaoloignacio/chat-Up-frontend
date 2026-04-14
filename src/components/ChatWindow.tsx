@@ -21,7 +21,7 @@ export const ChatWindow = ({ onLogout }: Props) => {
   };
 
   return (
-    <div className="glass-bg relative flex h-screen items-center justify-center">
+    <div className="glass-bg relative flex items-center justify-center" style={{ height: '100dvh' }}>
       {/* Orbs */}
       <div className="orb-purple" />
       <div className="orb-pink" />
