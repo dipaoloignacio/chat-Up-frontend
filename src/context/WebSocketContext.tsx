@@ -55,6 +55,12 @@ interface WebSocketContextState {
   defaultGroup: { id: string; name: string } | null;
 }
 
+const playNotification = () => {
+  const audio = new Audio("/sound.wav");
+  audio.volume = 0.5;
+  audio.play().catch(() => {});
+};
+
 export const WebSocketContext = createContext({} as WebSocketContextState);
 
 interface Props {
@@ -70,7 +76,7 @@ export const WebSocketProvider = ({ children }: Props) => {
   } | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const reconnectAttempts = useRef(0); // ✅ nuevo
+  const reconnectAttempts = useRef(0);
 
   const connect = useCallback(() => {
     if (socketRef.current) {
@@ -95,6 +101,11 @@ export const WebSocketProvider = ({ children }: Props) => {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setLastMessage(data);
+      if (data.type === "SEND_DIRECT_MESSAGES_RESPONSE") {
+        if (data.payload.messages.length === 1) {
+          playNotification();
+        }
+      }
       if (data.type === "SEND_GROUP_MESSAGES_RESPONSE") {
         setDefaultGroup({ id: data.payload.groupId, name: "Chat del grupo" });
       }
