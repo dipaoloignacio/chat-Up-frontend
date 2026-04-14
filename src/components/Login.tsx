@@ -46,7 +46,7 @@ export const Login = () => {
       >
         {/* Título */}
         <div className="flex flex-col items-center gap-1 mb-2">
-          <h1 className="text-2xl font-semibold text-white tracking-wide">Chat App</h1>
+          <h1 className="text-2xl font-semibold text-white tracking-wide">Chat Up</h1>
           <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
             ingresá con tu cuenta
           </p>

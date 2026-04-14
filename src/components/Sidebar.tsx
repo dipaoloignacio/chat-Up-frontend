@@ -26,48 +26,78 @@ export const Sidebar = ({ onSelect }: Props) => {
   };
 
   return (
-    <div className="flex flex-col overflow-y-auto flex-1">
-
-      <p className="text-xs px-3 pt-3 pb-1 tracking-widest uppercase"
-        style={{ color: "rgba(255,255,255,0.25)", fontSize: "9px" }}>
+    <div
+      className="flex flex-col overflow-y-auto flex-1 py-2"
+      style={{
+        scrollbarWidth: "thin",
+        scrollbarColor: "rgba(192,132,252,0.2) transparent",
+      }}
+    >
+      <p
+        className="text-xs px-4 pt-2 pb-1 tracking-widest uppercase"
+        style={{ color: "rgba(255,255,255,0.25)", fontSize: "9px" }}
+      >
         // grupos
       </p>
 
       {defaultGroup && (
         <button
           onClick={() => handleSelect(defaultGroup.id, "group")}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs text-left w-full mx-1.5 rounded-lg transition-all"
-          style={activeId === defaultGroup.id
-            ? { background: "rgba(192,132,252,0.12)", color: "#e0c3fc", border: "1px solid rgba(192,132,252,0.2)" }
-            : { color: "rgba(255,255,255,0.35)", border: "1px solid transparent" }
+          className="flex items-center gap-2 px-4 py-2 text-sm text-left w-full rounded-lg transition-all"
+          style={
+            activeId === defaultGroup.id
+              ? {
+                  background: "rgba(192,132,252,0.12)",
+                  color: "#e0c3fc",
+                  border: "1px solid rgba(192,132,252,0.2)",
+                }
+              : {
+                  color: "rgba(255,255,255,0.45)",
+                  border: "1px solid transparent",
+                }
           }
         >
-          <span style={{ color: "rgba(192,132,252,0.5)" }}>#</span>
+          <span style={{ color: "rgba(192,132,252,0.6)" }}>#</span>
           {defaultGroup.name}
         </button>
       )}
 
-      <hr className="my-2 mx-3" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
+      <hr
+        className="my-2 mx-4"
+        style={{ borderColor: "rgba(255,255,255,0.06)" }}
+      />
 
-      <p className="text-xs px-3 pb-1 tracking-widest uppercase"
-        style={{ color: "rgba(255,255,255,0.25)", fontSize: "9px" }}>
+      <p
+        className="text-xs px-4 pb-1 tracking-widest uppercase"
+        style={{ color: "rgba(255,255,255,0.25)", fontSize: "9px" }}
+      >
         // conectados
       </p>
 
       {userConnected
-        .filter(u => u.id !== auth.userId)
-        .map(user => (
+        .filter((u) => u.id !== auth.userId)
+        .map((user) => (
           <button
             key={user.id}
             onClick={() => handleSelect(user.id, "direct")}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs text-left w-full mx-1.5 rounded-lg transition-all"
-            style={activeId === user.id
-              ? { background: "rgba(192,132,252,0.12)", color: "#e0c3fc", border: "1px solid rgba(192,132,252,0.2)" }
-              : { color: "rgba(255,255,255,0.35)", border: "1px solid transparent" }
+            className="flex items-center gap-2 px-4 py-2 text-sm text-left w-full rounded-lg transition-all"
+            style={
+              activeId === user.id
+                ? {
+                    background: "rgba(192,132,252,0.12)",
+                    color: "#e0c3fc",
+                    border: "1px solid rgba(192,132,252,0.2)",
+                  }
+                : {
+                    color: "rgba(255,255,255,0.45)",
+                    border: "1px solid transparent",
+                  }
             }
           >
-            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 dot-online"
-              style={{ background: "#a3e635" }} />
+            <span
+              className="w-2 h-2 rounded-full flex-shrink-0"
+              style={{ background: "#a3e635" }}
+            />
             {user.name}
           </button>
         ))}

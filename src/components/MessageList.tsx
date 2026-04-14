@@ -39,25 +39,31 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
       case "SEND_DIRECT_MESSAGES_RESPONSE":
         if (chatType === "direct") {
           const incoming = lastMessage.payload.messages;
+          if (!incoming?.length) break;
           if (incoming.length > 1) {
             setMessages(incoming);
           } else {
-            setMessages((prev) => [...prev, ...incoming]);
+            setMessages((prev) => {
+              const exists = prev.some((m) => m.id === incoming[0].id);
+              if (exists) return prev;
+              return [...prev, ...incoming];
+            });
           }
         }
-        break;
-      case "ERROR":
-        setError(lastMessage.payload.error);
         break;
     }
   }, [lastMessage, chatType]);
 
   useEffect(() => {
     if (!selectedId) return;
+     setMessages([])
     if (chatType === "group") {
       send({ type: "GET_GROUP_MESSAGES", payload: { groupId: selectedId } });
     } else {
-      send({ type: "GET_DIRECT_MESSAGES", payload: { receiverId: selectedId } });
+      send({
+        type: "GET_DIRECT_MESSAGES",
+        payload: { receiverId: selectedId },
+      });
     }
   }, [selectedId]);
 
@@ -75,8 +81,14 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
       ) : (
         <>
           {error && (
-            <p className="text-xs px-3 py-2 rounded-lg"
-              style={{ background: "rgba(255,107,107,0.12)", border: "1px solid rgba(255,107,107,0.25)", color: "#ff6b6b" }}>
+            <p
+              className="text-xs px-3 py-2 rounded-lg"
+              style={{
+                background: "rgba(255,107,107,0.12)",
+                border: "1px solid rgba(255,107,107,0.25)",
+                color: "#ff6b6b",
+              }}
+            >
               {error}
             </p>
           )}
