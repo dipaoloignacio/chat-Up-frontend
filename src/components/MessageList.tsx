@@ -51,12 +51,15 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
           }
         }
         break;
+      case "ERROR":
+        setError(lastMessage.payload.error);
+        break;
     }
   }, [lastMessage, chatType]);
 
   useEffect(() => {
     if (!selectedId) return;
-     setMessages([])
+    setMessages([]);
     if (chatType === "group") {
       send({ type: "GET_GROUP_MESSAGES", payload: { groupId: selectedId } });
     } else {
