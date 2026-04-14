@@ -71,12 +71,12 @@ export const WebSocketProvider = ({ children, url }: Props) => {
   } | null>(null);
 
   const connect = useCallback(() => {
-    const socket = new WebSocket(url);
+    const token = localStorage.getItem("token") ?? "";
+    const socket = new WebSocket(
+      `wss://chatup-api.dipaoloproyects.space?token=${token}`,
+    );
 
-    socket.onopen = () => {
-      setStatus("connected");
-    };
-
+    socket.onopen = () => setStatus("connected");
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setLastMessage(data);
@@ -88,7 +88,7 @@ export const WebSocketProvider = ({ children, url }: Props) => {
     socket.onclose = () => setStatus("disconnected");
 
     return socket;
-  }, [url]);
+  }, []); // ← sin dependencias
 
   useEffect(() => {
     const socket = connect();
