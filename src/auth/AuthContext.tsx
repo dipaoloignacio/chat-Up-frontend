@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }: Props) => {
       document.cookie = `X-Token=${data.token}; path=/`;
 
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
 
       setAuth({
         userId: data.user.id,
