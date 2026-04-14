@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -42,7 +43,7 @@ export type ServerMessage =
         receiverId: string;
         senderId: string;
         messages: ChatMessage[];
-      }; // 👈
+      };
     }
   | { type: "SEND_CONNECTED_USERS_RESPONSE"; payload: { users: Sender[] } };
 
@@ -58,88 +59,84 @@ export const WebSocketContext = createContext({} as WebSocketContextState);
 
 interface Props {
   children: ReactNode;
-  url: string;
+  url?: string;
 }
 
 export const WebSocketProvider = ({ children }: Props) => {
   const [status, setStatus] = useState<ConexionStatus>("connecting");
-  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [lastMessage, setLastMessage] = useState<ServerMessage | null>(null);
   const [defaultGroup, setDefaultGroup] = useState<{
     id: string;
     name: string;
   } | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
+  const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
+    // Cerrar conexión anterior si existe
+    if (socketRef.current) {
+      socketRef.current.onclose = null;
+      socketRef.current.close();
+    }
+
     const token = localStorage.getItem("token") ?? "";
-    const socket = new WebSocket(
+    const ws = new WebSocket(
       `wss://chatup-api.dipaoloproyects.space?token=${token}`,
     );
+    socketRef.current = ws;
 
-    socket.onopen = () => setStatus("connected");
-    socket.onmessage = (event) => {
+    ws.onopen = () => setStatus("connected");
+
+    ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setLastMessage(data);
       if (data.type === "SEND_GROUP_MESSAGES_RESPONSE") {
         setDefaultGroup({ id: data.payload.groupId, name: "Chat del grupo" });
       }
     };
-    socket.onerror = () => setStatus("error");
-    socket.onclose = () => setStatus("disconnected");
 
-    return socket;
-  }, []); // ← sin dependencias
+    ws.onerror = () => setStatus("error");
+
+    ws.onclose = () => {
+      setStatus("disconnected");
+      // Reconectar una sola vez después de 3s
+      reconnectTimeout.current = setTimeout(() => {
+        connect();
+      }, 3000);
+    };
+  }, []);
 
   useEffect(() => {
-    const socket = connect();
-    setSocket(socket);
+    connect();
     return () => {
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.close();
+      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
+      if (socketRef.current) {
+        socketRef.current.onclose = null;
+        socketRef.current.close();
       }
     };
-  }, [connect]);
+  }, []);
 
   const disconnect = useCallback(() => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.close();
+    if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
+    if (socketRef.current) {
+      socketRef.current.onclose = null;
+      socketRef.current.close();
     }
-  }, [socket]);
-
-  //funcion de re-coneccion
-  useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
-
-    if (status === "disconnected") {
-      timeout = setTimeout(() => {
-        const newSocket = connect();
-        setSocket(newSocket);
-      }, 3000);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [status, connect]);
+    setStatus("disconnected");
+  }, []);
 
   const send = useCallback(
     (message: ClientMessage) => {
-      if (!socket) throw new Error("Socket not connected");
-      if (status !== "connected") throw new Error("Socket not connected");
-
-      const jsonMessage = JSON.stringify(message);
-      socket.send(jsonMessage);
+      if (!socketRef.current || status !== "connected") return;
+      socketRef.current.send(JSON.stringify(message));
     },
-    [socket, status],
+    [status],
   );
 
   return (
     <WebSocketContext
-      value={{
-        status: status,
-        send: send,
-        lastMessage: lastMessage,
-        disconnect,
-        defaultGroup,
-      }}
+      value={{ status, send, lastMessage, disconnect, defaultGroup }}
     >
       {children}
     </WebSocketContext>
