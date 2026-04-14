@@ -59,7 +59,6 @@ export const WebSocketContext = createContext({} as WebSocketContextState);
 
 interface Props {
   children: ReactNode;
-  url?: string;
 }
 
 export const WebSocketProvider = ({ children }: Props) => {
@@ -71,21 +70,27 @@ export const WebSocketProvider = ({ children }: Props) => {
   } | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectAttempts = useRef(0); // ✅ nuevo
 
   const connect = useCallback(() => {
-    // Cerrar conexión anterior si existe
     if (socketRef.current) {
       socketRef.current.onclose = null;
       socketRef.current.close();
     }
 
     const token = localStorage.getItem("token") ?? "";
-    const ws = new WebSocket(
-      `wss://chatup-api.dipaoloproyects.space?token=${token}`,
-    );
+    if (!token) {
+      setStatus("error");
+      return;
+    }
+
+    const ws = new WebSocket(`${import.meta.env.VITE_WS_URL}?token=${token}`);
     socketRef.current = ws;
 
-    ws.onopen = () => setStatus("connected");
+    ws.onopen = () => {
+      setStatus("connected");
+      reconnectAttempts.current = 0; // ✅ resetear al conectar
+    };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -99,10 +104,11 @@ export const WebSocketProvider = ({ children }: Props) => {
 
     ws.onclose = () => {
       setStatus("disconnected");
-      // Reconectar una sola vez después de 3s
-      reconnectTimeout.current = setTimeout(() => {
-        connect();
-      }, 3000);
+      if (reconnectAttempts.current < 5) {
+        const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 15000);
+        reconnectAttempts.current += 1;
+        reconnectTimeout.current = setTimeout(connect, delay);
+      }
     };
   }, []);
 
@@ -118,6 +124,7 @@ export const WebSocketProvider = ({ children }: Props) => {
   }, []);
 
   const disconnect = useCallback(() => {
+    reconnectAttempts.current = 5; // ✅ evita que reconecte al cerrar
     if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
     if (socketRef.current) {
       socketRef.current.onclose = null;

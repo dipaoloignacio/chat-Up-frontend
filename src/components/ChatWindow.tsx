@@ -20,8 +20,19 @@ export const ChatWindow = ({ onLogout }: Props) => {
     setSidebarOpen(false);
   };
 
+  //classname
+  const sidebarClass = [
+    "glass-panel flex flex-col w-64 z-[20]",
+    "fixed inset-y-0 left-0 transition-transform duration-200",
+    "sm:relative sm:translate-x-0",
+    sidebarOpen ? "translate-x-0" : "-translate-x-full",
+  ].join(" ");
+
   return (
-    <div className="glass-bg relative flex items-center justify-center" style={{ height: '100dvh' }}>
+    <div
+      className="glass-bg relative flex items-center justify-center"
+      style={{ height: "100dvh" }}
+    >
       {/* Orbs */}
       <div className="orb-purple" />
       <div className="orb-pink" />
@@ -38,13 +49,17 @@ export const ChatWindow = ({ onLogout }: Props) => {
         )}
 
         {/* 2 — SIDEBAR z-[20] */}
+
         <div
-          className={`
-            glass-panel flex flex-col w-64 z-[20]
-            fixed inset-y-0 left-0 transition-transform duration-200
-            sm:relative sm:translate-x-0
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          `}
+          className={sidebarClass}
+          style={
+            sidebarOpen
+              ? {
+                  background: "rgba(10, 3, 25, 0.99)",
+                  backdropFilter: "blur(20px)",
+                }
+              : {}
+          }
         >
           <div
             className="flex items-center gap-2 p-3"
@@ -76,9 +91,10 @@ export const ChatWindow = ({ onLogout }: Props) => {
         </div>
 
         {/* 3 — CHAT z-[10] */}
-        <div className="glass-panel-light flex flex-col flex-1 min-w-0 relative z-[10]">
+        <div className="glass-panel-light flex flex-col flex-1 min-w-0 relative z-[10] h-full overflow-hidden">
+          {/* Header mobile */}
           <div
-            className="flex items-center gap-3 px-4 py-2 sm:hidden"
+            className="flex items-center gap-3 px-4 py-2 sm:hidden flex-shrink-0"
             style={{
               borderBottom: "1px solid rgba(255,255,255,0.08)",
               background: "rgba(255,255,255,0.04)",
@@ -98,8 +114,16 @@ export const ChatWindow = ({ onLogout }: Props) => {
               {selectedId ? "# chat" : "seleccioná un canal"}
             </span>
           </div>
-          <MessageList selectedId={selectedId} chatType={chatType} />
-          <MessageInput selectedId={selectedId} chatType={chatType} />
+
+          {/* Mensajes — crece y scrollea */}
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <MessageList selectedId={selectedId} chatType={chatType} />
+          </div>
+
+          {/* Input — siempre abajo */}
+          <div className="flex-shrink-0">
+            <MessageInput selectedId={selectedId} chatType={chatType} />
+          </div>
         </div>
       </div>
     </div>

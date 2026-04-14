@@ -39,14 +39,17 @@ export const AuthProvider = ({ children }: Props) => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch("https://chatup-api.dipaoloproyects.space/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        "https://chatup-api.dipaoloproyects.space/api/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        },
+      );
 
       const data = await res.json();
-
+      console.log("login response:", data);
       if (!res.ok) return false;
 
       document.cookie = `X-Token=${data.token}; path=/`;
@@ -71,6 +74,7 @@ export const AuthProvider = ({ children }: Props) => {
   const logout = () => {
     document.cookie = "X-Token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setAuth({ ...initialState, checking: false });
   };
   const checkAuth = useCallback(() => {

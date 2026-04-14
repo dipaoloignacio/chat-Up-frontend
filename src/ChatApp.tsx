@@ -1,21 +1,19 @@
 import { useAuth } from "./hooks/useAuth";
-import { useSocketChat } from "./hooks/useSocketChat";
 import { ChatWindow } from "./components/ChatWindow";
 import { Login } from "./components/Login";
+import { WebSocketProvider } from "./context/WebSocketContext";
 
 function App() {
   const { auth, logout } = useAuth();
-  const { disconnect } = useSocketChat();
 
   if (auth.checking) return <div>Cargando...</div>;
   if (!auth.logged) return <Login />;
 
-  const handleLogout = () => {
-    disconnect();
-    logout();
-  };
-
-  return <ChatWindow onLogout={handleLogout} />;
+  return (
+    <WebSocketProvider>
+      <ChatWindow onLogout={logout} />
+    </WebSocketProvider>
+  );
 }
 
 export default App;

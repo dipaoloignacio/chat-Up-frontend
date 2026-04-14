@@ -2,9 +2,19 @@ import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { TestUsers } from "./TestUsers";
 
+const DEMO_USERS = [
+  { email: "juan@google.com", password: "123456" },
+  { email: "maria@google.com", password: "123456" },
+  { email: "pedro@google.com", password: "123456" },
+  { email: "ana@google.com", password: "123456" },
+  { email: "luis@google.com", password: "123456" },
+];
+
 export const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const randomUser = DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)];
+
+  const [email, setEmail] = useState(randomUser.email);
+  const [password, setPassword] = useState(randomUser.password);
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
 
@@ -26,13 +36,35 @@ export const Login = () => {
   return (
     <div
       className="flex h-screen items-center justify-center relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #1a0533, #2d1b69, #11001f)" }}
+      style={{
+        background: "linear-gradient(135deg, #1a0533, #2d1b69, #11001f)",
+      }}
     >
       {/* Orbs */}
-      <div className="pointer-events-none absolute"
-        style={{ width: 300, height: 300, borderRadius: "50%", background: "rgba(139,92,246,0.15)", filter: "blur(60px)", top: -60, right: 80 }} />
-      <div className="pointer-events-none absolute"
-        style={{ width: 200, height: 200, borderRadius: "50%", background: "rgba(236,72,153,0.1)", filter: "blur(50px)", bottom: 40, left: 60 }} />
+      <div
+        className="pointer-events-none absolute"
+        style={{
+          width: 300,
+          height: 300,
+          borderRadius: "50%",
+          background: "rgba(139,92,246,0.15)",
+          filter: "blur(60px)",
+          top: -60,
+          right: 80,
+        }}
+      />
+      <div
+        className="pointer-events-none absolute"
+        style={{
+          width: 200,
+          height: 200,
+          borderRadius: "50%",
+          background: "rgba(236,72,153,0.1)",
+          filter: "blur(50px)",
+          bottom: 40,
+          left: 60,
+        }}
+      />
 
       {/* Card */}
       <div
@@ -46,7 +78,9 @@ export const Login = () => {
       >
         {/* Título */}
         <div className="flex flex-col items-center gap-1 mb-2">
-          <h1 className="text-2xl font-semibold text-white tracking-wide">Chat Up</h1>
+          <h1 className="text-2xl font-semibold text-white tracking-wide">
+            Chat Up
+          </h1>
           <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
             ingresá con tu cuenta
           </p>
@@ -107,11 +141,17 @@ export const Login = () => {
 
         {/* Divider */}
         <div className="flex items-center gap-2">
-          <hr className="flex-1" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
+          <hr
+            className="flex-1"
+            style={{ borderColor: "rgba(255,255,255,0.08)" }}
+          />
           <span className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
             usuarios de prueba
           </span>
-          <hr className="flex-1" style={{ borderColor: "rgba(255,255,255,0.08)" }} />
+          <hr
+            className="flex-1"
+            style={{ borderColor: "rgba(255,255,255,0.08)" }}
+          />
         </div>
 
         <TestUsers onSelect={handleSelectTestUser} />
