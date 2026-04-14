@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-glass-bg1:     #1a0533;
+  --color-glass-bg2:     #2d1b69;
+  --color-glass-bg3:     #11001f;
+  --color-glass-surface: rgba(255,255,255,0.06);
+  --color-glass-border:  rgba(255,255,255,0.08);
+  --color-glass-hover:   rgba(192,132,252,0.12);
+  --color-purple-pill:   rgba(192,132,252,0.15);
+  --color-purple-light:  #e0c3fc;
+  --color-purple-mid:    #c084fc;
+  --color-cyan-msg:      #a5f3fc;
+  --color-cyan-mid:      #67e8f9;
+  --color-red-out:       #ff6b6b;
+  --color-green-dot:     #a3e635;
+}
+
+.glass-bg {
+  background: linear-gradient(135deg, #1a0533, #2d1b69, #11001f);
+  min-height: 100vh;
+}
+
+.glass-panel {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.glass-panel-light {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dot-online {
+  box-shadow: 0 0 6px #a3e635;
+}
+
+.bubble-other {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0 10px 10px 10px;
+}
+
+.bubble-me {
+  background: rgba(103,232,249,0.08);
+  border: 1px solid rgba(103,232,249,0.2);
+  border-radius: 10px 0 10px 10px;
+}
+
+.orb-purple {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(139,92,246,0.12);
+  filter: blur(60px);
+  pointer-events: none;
+  top: -50px;
+  right: 100px;
+  z-index: 0;
+}
+
+.orb-pink {
+  position: fixed;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(236,72,153,0.08);
+  filter: blur(50px);
+  pointer-events: none;
+  bottom: 50px;
+  left: 50px;
+  z-index: 0;
+}
