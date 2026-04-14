@@ -38,7 +38,10 @@ export const ChatWindow = ({ onLogout }: Props) => {
       <div className="orb-pink" />
 
       {/* Contenedor centrado */}
-      <div className="relative flex w-full h-full max-w-5xl sm:h-[90vh] sm:rounded-2xl sm:shadow-2xl overflow-hidden">
+      <div
+        className="relative flex w-full max-w-5xl h-full sm:h-[90vh] sm:rounded-2xl sm:shadow-2xl overflow-hidden"
+        style={{ maxHeight: "100dvh" }}
+      >
         {/* 1 — OVERLAY z-[15] */}
         {sidebarOpen && (
           <div
