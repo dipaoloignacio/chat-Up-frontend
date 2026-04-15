@@ -45,6 +45,14 @@ export type ServerMessage =
         messages: ChatMessage[];
       };
     }
+  | {
+      type: "NEW_DIRECT_MESSAGE";
+      payload: {
+        receiverId: string;
+        senderId: string;
+        messages: ChatMessage[];
+      };
+    }
   | { type: "SEND_CONNECTED_USERS_RESPONSE"; payload: { users: Sender[] } };
 
 interface WebSocketContextState {
@@ -55,11 +63,7 @@ interface WebSocketContextState {
   defaultGroup: { id: string; name: string } | null;
 }
 
-const playNotification = () => {
-  const audio = new Audio("/sound.wav");
-  audio.volume = 0.5;
-  audio.play().catch(() => {});
-};
+
 
 export const WebSocketContext = createContext({} as WebSocketContextState);
 
@@ -101,11 +105,7 @@ export const WebSocketProvider = ({ children }: Props) => {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setLastMessage(data);
-      if (data.type === "SEND_DIRECT_MESSAGES_RESPONSE") {
-        if (data.payload.messages.length === 1) {
-          playNotification();
-        }
-      }
+
       if (data.type === "SEND_GROUP_MESSAGES_RESPONSE") {
         setDefaultGroup({ id: data.payload.groupId, name: "Chat del grupo" });
       }

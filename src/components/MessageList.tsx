@@ -2,18 +2,25 @@ import { useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "../types/chat";
 import { useSocketChat } from "../hooks/useSocketChat";
 import { MessageBubble } from "./MessageBubble";
+import { useAuth } from "../hooks/useAuth";
 
 interface Props {
   selectedId: string | null;
   chatType: "group" | "direct" | null;
 }
 
+const playNotification = () => {
+  const audio = new Audio("/sound.wav");
+  audio.volume = 0.5;
+  audio.play().catch(() => {});
+};
+
 export const MessageList = ({ selectedId, chatType }: Props) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { lastMessage, send } = useSocketChat();
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
+  const { auth } = useAuth();
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -36,21 +43,38 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
           }
         }
         break;
+
       case "SEND_DIRECT_MESSAGES_RESPONSE":
         if (chatType === "direct") {
-          const incoming = lastMessage.payload.messages;
-          if (!incoming?.length) break;
-          if (incoming.length > 1) {
-            setMessages(incoming);
-          } else {
-            setMessages((prev) => {
-              const exists = prev.some((m) => m.id === incoming[0].id);
-              if (exists) return prev;
-              return [...prev, ...incoming];
-            });
-          }
+          // verificar que el historial es del chat abierto
+          if (lastMessage.payload.receiverId !== selectedId) break;
+          setMessages(lastMessage.payload.messages ?? []);
         }
         break;
+
+      case "NEW_DIRECT_MESSAGE":
+        if (chatType === "direct") {
+          const incoming = lastMessage.payload.messages[0];
+
+          if (
+            lastMessage.payload.receiverId !== selectedId &&
+            incoming.sender?.id !== selectedId
+          )
+            break;
+
+          // solo suena si el mensaje no es tuyo
+          if (incoming.sender?.id !== auth.userId) {
+            playNotification();
+          }
+
+          setMessages((prev) => {
+            const exists = prev.some((m) => m.id === incoming.id);
+            if (exists) return prev;
+            return [...prev, incoming];
+          });
+        }
+        break;
+
       case "ERROR":
         setError(lastMessage.payload.error);
         break;
