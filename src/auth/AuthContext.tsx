@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: Props) => {
       );
 
       const data = await res.json();
-      console.log("login response:", data);
+  
       if (!res.ok) return false;
 
       document.cookie = `X-Token=${data.token}; path=/`;

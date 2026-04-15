@@ -97,7 +97,7 @@ export const ChatWindow = ({ onLogout }: Props) => {
         <div className="glass-panel-light flex flex-col flex-1 min-w-0 relative z-[10] h-full overflow-hidden">
           {/* Header mobile */}
           <div
-            className="flex items-center gap-3 px-4 py-2 sm:hidden flex-shrink-0"
+            className="sticky flex items-center gap-3 px-4 py-2 sm:hidden flex-shrink-0"
             style={{
               borderBottom: "1px solid rgba(255,255,255,0.08)",
               background: "rgba(255,255,255,0.04)",
