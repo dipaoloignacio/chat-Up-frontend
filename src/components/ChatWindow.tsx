@@ -39,7 +39,7 @@ export const ChatWindow = ({ onLogout }: Props) => {
 
       {/* Contenedor centrado */}
       <div
-        className="relative flex w-full max-w-5xl h-full sm:h-[90vh] sm:rounded-2xl sm:shadow-2xl overflow-hidden"
+        className="relative flex w-full max-w-5xl h-full sm:h-screen sm:rounded-2xl sm:shadow-2xl overflow-hidden"
         style={{ maxHeight: "100dvh" }}
       >
         {/* 1 — OVERLAY z-[15] */}
@@ -94,7 +94,7 @@ export const ChatWindow = ({ onLogout }: Props) => {
         </div>
 
         {/* 3 — CHAT z-[10] */}
-        <div className="glass-panel-light flex flex-col flex-1 min-w-0 relative z-[10] h-full overflow-hidden">
+        <div className="glass-panel-light flex flex-col flex-1 min-w-0 relative z-[10] h-full min-h-0">
           {/* Header mobile */}
           <div
             className="sticky flex items-center gap-3 px-4 py-2 sm:hidden flex-shrink-0"
@@ -119,7 +119,7 @@ export const ChatWindow = ({ onLogout }: Props) => {
           </div>
 
           {/* Mensajes — crece y scrollea */}
-          <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="flex-1 min-h-0 flex overflow-y-auto">
             <MessageList selectedId={selectedId} chatType={chatType} />
           </div>
 
