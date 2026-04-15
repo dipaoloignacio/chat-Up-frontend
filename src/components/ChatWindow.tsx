@@ -29,14 +29,14 @@ export const ChatWindow = ({ onLogout }: Props) => {
   ].join(" ");
 
   return (
-    <div className="glass-bg relative flex items-start justify-center h-dvh">
+    <div className="glass-bg relative flex items-start justify-center h-dvh sm:py-6">
       {/* Orbs */}
       <div className="orb-purple" />
       <div className="orb-pink" />
 
       {/* Contenedor centrado */}
       <div
-        className="relative flex w-full max-w-5xl h-full sm:h-screen sm:rounded-2xl sm:shadow-2xl overflow-hidden"
+        className="relative flex w-full max-w-5xl h-full sm:rounded-2xl sm:shadow-2xl overflow-hidden"
         style={{ maxHeight: "100dvh" }}
       >
         {/* 1 — OVERLAY z-[15] */}
