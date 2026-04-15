@@ -29,10 +29,7 @@ export const ChatWindow = ({ onLogout }: Props) => {
   ].join(" ");
 
   return (
-    <div
-      className="glass-bg relative flex items-center justify-center"
-      style={{ height: "100dvh" }}
-    >
+    <div className="glass-bg relative flex items-start justify-center h-dvh">
       {/* Orbs */}
       <div className="orb-purple" />
       <div className="orb-pink" />
@@ -119,12 +116,12 @@ export const ChatWindow = ({ onLogout }: Props) => {
           </div>
 
           {/* Mensajes — crece y scrollea */}
-          <div className="flex-1 min-h-0 flex overflow-y-auto">
+          <div className="flex-1 min-h-0">
             <MessageList selectedId={selectedId} chatType={chatType} />
           </div>
 
           {/* Input — siempre abajo */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-1">
             <MessageInput selectedId={selectedId} chatType={chatType} />
           </div>
         </div>

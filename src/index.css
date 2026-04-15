@@ -18,7 +18,7 @@
 
 .glass-bg {
   background: linear-gradient(135deg, #1a0533, #2d1b69, #11001f);
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .glass-panel {

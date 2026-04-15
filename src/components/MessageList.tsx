@@ -21,6 +21,7 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { auth } = useAuth();
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -99,7 +100,7 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
   }, [selectedId]);
 
   return (
-    <div className="flex-1 flex flex-col px-4 py-3">
+    <div className="flex flex-col h-full">
       {!selectedId ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -110,7 +111,7 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3">
           {error && (
             <p
               className="text-xs px-3 py-2 rounded-lg"
