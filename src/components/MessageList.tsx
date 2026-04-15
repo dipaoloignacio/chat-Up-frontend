@@ -53,19 +53,23 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
         break;
 
       case "NEW_DIRECT_MESSAGE":
-        if (chatType === "direct") {
-          const incoming = lastMessage.payload.messages[0];
+        const incoming = lastMessage.payload.messages[0];
 
+        // suena si el sender no sos vos Y el chat abierto no es el de ese sender
+        if (
+          incoming.sender?.id !== auth.userId &&
+          incoming.sender?.id !== selectedId
+        ) {
+          playNotification();
+        }
+
+        // renderizado solo si es el chat abierto
+        if (chatType === "direct") {
           if (
             lastMessage.payload.receiverId !== selectedId &&
             incoming.sender?.id !== selectedId
           )
             break;
-
-          // solo suena si el mensaje no es tuyo
-          if (incoming.sender?.id !== auth.userId) {
-            playNotification();
-          }
 
           setMessages((prev) => {
             const exists = prev.some((m) => m.id === incoming.id);
