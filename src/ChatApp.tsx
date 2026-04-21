@@ -6,7 +6,6 @@ import { LoadingScreen } from "./components/LoadingScreen";
 
 function App() {
   const { auth, logout } = useAuth();
-  console.log(auth)
   if (auth.checking) return <LoadingScreen />;
   if (!auth.logged) return <Login />;
 

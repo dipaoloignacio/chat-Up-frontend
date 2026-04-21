@@ -15,25 +15,17 @@ export const Sidebar = ({ onSelect }: Props) => {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const activeChatRef = useRef(activeId);
 
-  // useEffect(() => {
-  //   if (!lastMessage) return;
-  //   if (lastMessage.type === "SEND_CONNECTED_USERS_RESPONSE") {
-  //     setUserConnected(lastMessage.payload.users);
-  //   }
-  // }, [lastMessage]);
-
   useEffect(() => {
     activeChatRef.current = activeId;
   }, [activeId]);
 
-  // Agregar este useEffect para escuchar mensajes directos
+  //escuchar mensajes directos
   useEffect(() => {
     if (!lastMessage) return;
     if (lastMessage.type === "SEND_CONNECTED_USERS_RESPONSE") {
       setUserConnected(lastMessage.payload.users);
     }
 
-    // 👇 Agregá esto — cambiá "DIRECT_MESSAGE_RESPONSE" por el type de tu backend
     if (lastMessage.type === "NEW_DIRECT_MESSAGE") {
       const senderId = lastMessage.payload.messages[0].sender.id;
 
@@ -51,6 +43,8 @@ export const Sidebar = ({ onSelect }: Props) => {
     setUnreadCounts((prev) => ({ ...prev, [id]: 0 })); // 👈 esto
     onSelect(id, type);
   };
+
+  const SKELETON_WIDTHS = ["72%", "55%", "80%", "63%", "70%"];
 
   return (
     <div
@@ -101,50 +95,74 @@ export const Sidebar = ({ onSelect }: Props) => {
         // conectados
       </p>
 
-      {userConnected
-        .filter((u) => u.id !== auth.userId)
-        .map((user) => (
-          <button
-            key={user.id}
-            onClick={() => handleSelect(user.id, "direct")}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-left w-full rounded-lg transition-all"
-            style={
-              activeId === user.id
-                ? {
-                    background: "rgba(192,132,252,0.12)",
-                    color: "#e0c3fc",
-                    border: "1px solid rgba(192,132,252,0.2)",
-                  }
-                : {
-                    color: "rgba(255,255,255,0.45)",
-                    border: "1px solid transparent",
-                  }
-            }
-          >
-            <span
-              className="w-2 h-2 rounded-full flex-shrink-0"
-              style={{ background: "#a3e635" }}
-            />
-            {user.name}
-
-            {/* 👇 Badge */}
-            {unreadCounts[user.id] > 0 && (
-              <span
-                className="ml-auto text-xs font-bold rounded-full flex items-center justify-center"
+      {userConnected.length === 0 ? (
+        <div className="flex flex-col gap-1 px-2">
+          {SKELETON_WIDTHS.map((width, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg w-full"
+              style={{ opacity: 1 - i * 0.15 }}
+            >
+              <div
+                className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse"
+                style={{ background: "rgba(192,132,252,0.3)" }}
+              />
+              <div
+                className="h-3 rounded animate-pulse"
                 style={{
-                  background: "rgba(192,132,252,0.8)",
-                  color: "#fff",
-                  minWidth: "18px",
-                  height: "18px",
-                  padding: "0 5px",
-                  fontSize: "10px",
+                  background: "rgba(255,255,255,0.08)",
+                  width,
                 }}
-              >
-                {unreadCounts[user.id] > 99 ? "99+" : unreadCounts[user.id]}
-              </span>
-            )}
-          </button>
-        ))}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        userConnected
+          .filter((u) => u.id !== auth.userId)
+          .map((user) => (
+            <button
+              key={user.id}
+              onClick={() => handleSelect(user.id, "direct")}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-left w-full rounded-lg transition-all"
+              style={
+                activeId === user.id
+                  ? {
+                      background: "rgba(192,132,252,0.12)",
+                      color: "#e0c3fc",
+                      border: "1px solid rgba(192,132,252,0.2)",
+                    }
+                  : {
+                      color: "rgba(255,255,255,0.45)",
+                      border: "1px solid transparent",
+                    }
+              }
+            >
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ background: "#a3e635" }}
+              />
+              {user.name}
+
+              {/* 👇 Badge */}
+              {unreadCounts[user.id] > 0 && (
+                <span
+                  className="ml-auto text-xs font-bold rounded-full flex items-center justify-center"
+                  style={{
+                    background: "rgba(192,132,252,0.8)",
+                    color: "#fff",
+                    minWidth: "18px",
+                    height: "18px",
+                    padding: "0 5px",
+                    fontSize: "10px",
+                  }}
+                >
+                  {unreadCounts[user.id] > 99 ? "99+" : unreadCounts[user.id]}
+                </span>
+              )}
+            </button>
+          ))
+      )}
     </div>
   );
 };
