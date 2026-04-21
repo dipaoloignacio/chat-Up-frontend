@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSocketChat } from "../hooks/useSocketChat";
 import type { Sender } from "../types/chat";
 import { useAuth } from "../hooks/useAuth";
@@ -12,16 +12,43 @@ export const Sidebar = ({ onSelect }: Props) => {
   const [userConnected, setUserConnected] = useState<Sender[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const { auth } = useAuth();
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const activeChatRef = useRef(activeId);
 
+  // useEffect(() => {
+  //   if (!lastMessage) return;
+  //   if (lastMessage.type === "SEND_CONNECTED_USERS_RESPONSE") {
+  //     setUserConnected(lastMessage.payload.users);
+  //   }
+  // }, [lastMessage]);
+
+  useEffect(() => {
+    activeChatRef.current = activeId;
+  }, [activeId]);
+
+  // Agregar este useEffect para escuchar mensajes directos
   useEffect(() => {
     if (!lastMessage) return;
     if (lastMessage.type === "SEND_CONNECTED_USERS_RESPONSE") {
       setUserConnected(lastMessage.payload.users);
     }
+
+    // 👇 Agregá esto — cambiá "DIRECT_MESSAGE_RESPONSE" por el type de tu backend
+    if (lastMessage.type === "NEW_DIRECT_MESSAGE") {
+      const senderId = lastMessage.payload.messages[0].sender.id;
+
+      if (activeChatRef.current !== senderId) {
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [senderId]: (prev[senderId] || 0) + 1,
+        }));
+      }
+    }
   }, [lastMessage]);
 
   const handleSelect = (id: string, type: "group" | "direct") => {
     setActiveId(id);
+    setUnreadCounts((prev) => ({ ...prev, [id]: 0 })); // 👈 esto
     onSelect(id, type);
   };
 
@@ -99,6 +126,23 @@ export const Sidebar = ({ onSelect }: Props) => {
               style={{ background: "#a3e635" }}
             />
             {user.name}
+
+            {/* 👇 Badge */}
+            {unreadCounts[user.id] > 0 && (
+              <span
+                className="ml-auto text-xs font-bold rounded-full flex items-center justify-center"
+                style={{
+                  background: "rgba(192,132,252,0.8)",
+                  color: "#fff",
+                  minWidth: "18px",
+                  height: "18px",
+                  padding: "0 5px",
+                  fontSize: "10px",
+                }}
+              >
+                {unreadCounts[user.id] > 99 ? "99+" : unreadCounts[user.id]}
+              </span>
+            )}
           </button>
         ))}
     </div>

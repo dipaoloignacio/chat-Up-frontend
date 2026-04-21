@@ -38,6 +38,8 @@ export const AuthProvider = ({ children }: Props) => {
   const [auth, setAuth] = useState<AuthState>(initialState);
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    setAuth((prev) => ({ ...prev, checking: true })); // ← agregá esto
+
     try {
       const res = await fetch(
         "https://chatup-api.dipaoloproyects.space/api/login",
@@ -49,11 +51,13 @@ export const AuthProvider = ({ children }: Props) => {
       );
 
       const data = await res.json();
-  
-      if (!res.ok) return false;
+
+      if (!res.ok) {
+        setAuth((prev) => ({ ...prev, checking: false })); // ← y esto en el caso fallido
+        return false;
+      }
 
       document.cookie = `X-Token=${data.token}; path=/`;
-
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("token", data.token);
 
@@ -67,6 +71,7 @@ export const AuthProvider = ({ children }: Props) => {
 
       return true;
     } catch {
+      setAuth((prev) => ({ ...prev, checking: false })); // ← y en el catch
       return false;
     }
   };
