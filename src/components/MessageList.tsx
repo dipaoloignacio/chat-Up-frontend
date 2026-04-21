@@ -15,8 +15,85 @@ const playNotification = () => {
   audio.play().catch(() => {});
 };
 
+// Skeleton de una burbuja de mensaje
+const MessageSkeleton = ({ align }: { align: "left" | "right" }) => (
+  <li
+    className={`flex gap-2 items-end ${align === "right" ? "flex-row-reverse" : "flex-row"}`}
+  >
+    {/* Avatar */}
+    {align === "left" && (
+      <div
+        className="rounded-full flex-shrink-0"
+        style={{
+          width: 28,
+          height: 28,
+          background: "rgba(255,255,255,0.07)",
+          animation: "skeleton-pulse 1.4s ease-in-out infinite",
+        }}
+      />
+    )}
+
+    <div
+      className={`flex flex-col gap-1 ${align === "right" ? "items-end" : "items-start"}`}
+    >
+      {/* Burbuja principal */}
+      <div
+        style={{
+          height: 38,
+          width: `${align === "right" ? 140 + Math.random() * 80 : 100 + Math.random() * 120}px`,
+          borderRadius: 14,
+          background: "rgba(255,255,255,0.06)",
+          animation: "skeleton-pulse 1.4s ease-in-out infinite",
+        }}
+      />
+      {/* Timestamp */}
+      <div
+        style={{
+          height: 10,
+          width: 40,
+          borderRadius: 6,
+          background: "rgba(255,255,255,0.04)",
+          animation: "skeleton-pulse 1.4s ease-in-out infinite",
+          animationDelay: "0.2s",
+        }}
+      />
+    </div>
+  </li>
+);
+
+// Lista de skeletons con alturas y alineaciones variadas para parecer natural
+const SKELETON_PATTERN: Array<{ align: "left" | "right"; delay: string }> = [
+  { align: "left",  delay: "0s" },
+  { align: "left",  delay: "0.05s" },
+  { align: "right", delay: "0.1s" },
+  { align: "left",  delay: "0.15s" },
+  { align: "right", delay: "0.2s" },
+  { align: "right", delay: "0.25s" },
+  { align: "left",  delay: "0.3s" },
+  { align: "right", delay: "0.35s" },
+];
+
+const SkeletonList = () => (
+  <>
+    <style>{`
+      @keyframes skeleton-pulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.4; }
+      }
+    `}</style>
+    <ul className="flex flex-col gap-3">
+      {SKELETON_PATTERN.map((item, i) => (
+        <div key={i} style={{ animationDelay: item.delay }}>
+          <MessageSkeleton align={item.align} />
+        </div>
+      ))}
+    </ul>
+  </>
+);
+
 export const MessageList = ({ selectedId, chatType }: Props) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { lastMessage, send } = useSocketChat();
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -35,28 +112,29 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
           const incoming = lastMessage.payload.messages;
           if (incoming.length > 1) {
             setMessages(incoming);
+            setIsLoading(false);
           } else {
             setMessages((prev) => {
               const exists = prev.some((m) => m.id === incoming[0].id);
               if (exists) return prev;
               return [...prev, ...incoming];
             });
+            setIsLoading(false);
           }
         }
         break;
 
       case "SEND_DIRECT_MESSAGES_RESPONSE":
         if (chatType === "direct") {
-          // verificar que el historial es del chat abierto
           if (lastMessage.payload.receiverId !== selectedId) break;
           setMessages(lastMessage.payload.messages ?? []);
+          setIsLoading(false);
         }
         break;
 
       case "NEW_DIRECT_MESSAGE":
         const incoming = lastMessage.payload.messages[0];
 
-        // suena si el sender no sos vos Y el chat abierto no es el de ese sender
         if (
           incoming.sender?.id !== auth.userId &&
           incoming.sender?.id !== selectedId
@@ -64,7 +142,6 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
           playNotification();
         }
 
-        // renderizado solo si es el chat abierto
         if (chatType === "direct") {
           if (
             lastMessage.payload.receiverId !== selectedId &&
@@ -82,6 +159,7 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
 
       case "ERROR":
         setError(lastMessage.payload.error);
+        setIsLoading(false);
         break;
     }
   }, [lastMessage, chatType]);
@@ -89,6 +167,8 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
   useEffect(() => {
     if (!selectedId) return;
     setMessages([]);
+    setIsLoading(true);         // ← activa el skeleton al cambiar de chat
+    setError(null);
     if (chatType === "group") {
       send({ type: "GET_GROUP_MESSAGES", payload: { groupId: selectedId } });
     } else {
@@ -125,11 +205,15 @@ export const MessageList = ({ selectedId, chatType }: Props) => {
             </p>
           )}
 
-          <ul className="flex flex-col gap-3">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-          </ul>
+          {isLoading ? (
+            <SkeletonList />
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+            </ul>
+          )}
 
           <div ref={bottomRef} />
         </div>

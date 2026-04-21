@@ -14,7 +14,7 @@ export const MessageBubble = ({ message }: Props) => {
   const isMe = message.sender.id === auth.userId;
 
   return (
-    <li className={`flex flex-col max-w-xs gap-0.5 ${isMe ? "self-end" : "self-start"}`}>
+    <li className={`flex flex-col max-w-xs gap-0.5 break-words ${isMe ? "self-end" : "self-start"}`}>
       <span
         className="text-xs font-medium px-1"
         style={{ color: isMe ? "#67e8f9" : "#c084fc" }}
@@ -23,7 +23,7 @@ export const MessageBubble = ({ message }: Props) => {
       </span>
 
       <div
-        className="text-sm px-3 py-2 leading-relaxed"
+        className="text-sm px-3 py-2 leading-relaxed break-words whitespace-pre-wrap"
         style={
           isMe
             ? {

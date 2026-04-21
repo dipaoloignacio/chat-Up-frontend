@@ -11,7 +11,9 @@ interface Props {
 export const ChatWindow = ({ onLogout }: Props) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [chatType, setChatType] = useState<"group" | "direct" | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => window.matchMedia("(max-width: 768px)").matches,
+  );
   const { auth } = useAuth();
 
   const handleSelect = (id: string, type: "group" | "direct") => {
